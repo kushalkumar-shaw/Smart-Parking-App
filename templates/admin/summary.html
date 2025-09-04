@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3><i class="fas fa-chart-pie"></i> Admin Summary</h3>
+
+  <!-- Summary cards -->
+  <div class="row my-3">
+    <div class="col-md-4 mb-2">
+      <div class="card bg-light">
+        <div class="card-body text-center">
+          <h5 class="card-title">Total Users</h5>
+          <p class="display-6">{{ total_users }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-2">
+      <div class="card bg-light">
+        <div class="card-body text-center">
+          <h5 class="card-title">Total Reservations</h5>
+          <p class="display-6">{{ total_reservations }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-2">
+      <div class="card bg-light">
+        <div class="card-body text-center">
+          <h5 class="card-title">Total Revenue</h5>
+          <p class="display-6">₹{{ total_revenue }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <canvas id="barChart" height="200"></canvas>
+    </div>
+    <div class="col-md-6 mb-4">
+      <canvas id="pieChart" style="width: 100%; height: 150px;"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Users', 'Lots', 'Spots', 'Occupied', 'Reservations'],
+    datasets: [{
+      label: 'Stats',
+      data: [{{ total_users }}, {{ total_lots }}, {{ total_spots }}, {{ occupied_spots }}, {{ total_reservations }}],
+      backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6f42c1'],
+      borderRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: 'System Overview' },
+      legend: { display: false }
+    },
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
+
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+  type: 'pie',
+  data: {
+    labels: ['Occupied Spots', 'Available Spots'],
+    datasets: [{
+      data: [{{ occupied_spots }}, {{ total_spots - occupied_spots }}],
+      backgroundColor: ['#dc3545', '#198754']
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Spot Occupancy Distribution'
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

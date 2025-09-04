@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+    <form method="POST" action="{{ url_for('user.edit_profile') }}">
+        <div class="mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="full_name" name="full_name"
+                   value="{{ user.full_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username"
+                   value="{{ user.username }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Address</label>
+            <textarea class="form-control" id="address" name="address" rows="2"
+                      required>{{ user.address }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="pin_code" class="form-label">PIN Code</label>
+            <input type="text" class="form-control" id="pin_code" name="pin_code"
+                   value="{{ user.pin_code }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+        </button>
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
+{% endblock %}

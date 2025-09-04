@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="fas fa-user"></i> Welcome {{ user.username }}</h2>
+
+<!-- Active Reservations -->
+{% if active_reservations %}
+<div class="card mb-4">
+    <div class="card-header bg-warning">
+        <h5><i class="fas fa-clock"></i> Active Reservation</h5>
+    </div>
+    <div class="card-body">
+        {% for reservation in active_reservations %}
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h6>{{ reservation.spot.lot.prime_location_name }}</h6>
+                <p class="mb-1"><strong>Spot:</strong> #{{ reservation.spot.id }}</p>
+                <p class="mb-1"><strong>Parked Since:</strong> {{ reservation.parking_timestamp.strftime('%H:%M, %d/%m/%Y') }}</p>
+                <p class="mb-0"><strong>Rate:</strong> ₹{{ reservation.spot.lot.price }}/hour</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('user.release_spot', reservation_id=reservation.id) }}" 
+                   class="btn btn-danger"
+                   onclick="return confirm('Are you sure you want to release this spot?')">
+                    <i class="fas fa-sign-out-alt"></i> Release Spot
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Available Parking Lots -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-building"></i> Available Parking Lots</h5>
+    </div>
+    <div class="card-body">
+        {% if lots %}
+        <div class="row">
+            {% for lot in lots %}
+            {% set available_spots = lot.spots|selectattr('status', 'equalto', 'A')|list|length %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ lot.prime_location_name }}</h6>
+                        <p class="card-text">
+                            <small class="text-muted">{{ lot.address }}, {{ lot.pin_code }}</small>
+                        </p>
+                        <p class="mb-2">
+                            <strong>Rate:</strong> ₹{{ lot.price }}/hour<br>
+                            <strong>Available:</strong> 
+                            <span class="badge bg-{{ 'success' if available_spots > 0 else 'danger' }}">
+                                {{ available_spots }}/{{ lot.maximum_number_of_spots }}
+                            </span>
+                        </p>
+                        {% if available_spots > 0 and not active_reservations %}
+                        <a href="{{ url_for('user.book_spot', lot_id=lot.id) }}" 
+                           class="btn btn-success btn-sm"
+                           onclick="return confirm('Book a parking spot in {{ lot.prime_location_name }}?')">
+                            <i class="fas fa-car"></i> Book Spot
+                        </a>
+                        {% elif active_reservations %}
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            Already Booked
+                        </button>
+                        {% else %}
+                        <button class="btn btn-danger btn-sm" disabled>
+                            No Spots Available
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No parking lots available.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Parking History -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-history"></i> Parking History</h5>
+    </div>
+    <div class="card-body">
+        {% if past_reservations %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Spot</th>
+                        <th>Parked</th>
+                        <th>Released</th>
+                        <th>Duration</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in past_reservations|reverse %}
+                    <tr>
+                        <td>{{ reservation.spot.lot.prime_location_name }}</td>
+                        <td>#{{ reservation.spot.id }}</td>
+                        <td>{{ reservation.parking_timestamp.strftime('%H:%M, %d/%m') }}</td>
+                        <td>{{ reservation.leaving_timestamp.strftime('%H:%M, %d/%m') if reservation.leaving_timestamp }}</td>
+                        <td>
+                            {% if reservation.leaving_timestamp %}
+                            {% set duration = (reservation.leaving_timestamp - reservation.parking_timestamp).total_seconds() / 3600 %}
+                            {{ "%.1f"|format(duration) }}h
+                            {% endif %}
+                        </td>
+                        <td>₹{{ reservation.parking_cost or 0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No parking history found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

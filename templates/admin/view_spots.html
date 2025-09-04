@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> {{ lot.prime_location_name }} - Parking Spots</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Address:</strong> {{ lot.address }}, {{ lot.pin_code }}</p>
+                <p><strong>Price per Hour:</strong> ₹{{ lot.price }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Total Spots:</strong> {{ lot.maximum_number_of_spots }}</p>
+                <p><strong>Available:</strong> 
+                    <span class="badge bg-success">{{ spot_details|selectattr('spot.status', 'equalto', 'A')|list|length }}</span>
+                    <strong>Occupied:</strong>
+                    <span class="badge bg-danger">{{ spot_details|selectattr('spot.status', 'equalto', 'O')|list|length }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-car"></i> Parking Spots Status</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for detail in spot_details %}
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card {{ 'border-success' if detail.spot.status == 'A' else 'border-danger' }}">
+                    <div class="card-body text-center">
+                        <i class="fas fa-car fa-2x {{ 'text-success' if detail.spot.status == 'A' else 'text-danger' }} mb-2"></i>
+                        <h6>Spot #{{ detail.spot.id }}</h6>
+                        <span class="badge bg-{{ 'success' if detail.spot.status == 'A' else 'danger' }}">
+                            {{ 'Available' if detail.spot.status == 'A' else 'Occupied' }}
+                        </span>
+                        {% if detail.reservation %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>User:</strong> {{ detail.reservation.user.username }}<br>
+                                <strong>Since:</strong> {{ detail.reservation.parking_timestamp.strftime('%H:%M, %d/%m') }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
