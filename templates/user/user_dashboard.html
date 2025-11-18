@@ -1,94 +1,455 @@
 {% extends "base.html" %}
 {% block content %}
-<h2><i class="fas fa-user"></i> Welcome {{ user.username }}</h2>
 
-<!-- Active Reservations -->
+<!-- Active Reservations Alert -->
 {% if active_reservations %}
-<div class="card mb-4">
-    <div class="card-header bg-warning">
-        <h5><i class="fas fa-clock"></i> Active Reservation</h5>
-    </div>
-    <div class="card-body">
-        {% for reservation in active_reservations %}
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h6>{{ reservation.spot.lot.prime_location_name }}</h6>
-                <p class="mb-1"><strong>Spot:</strong> #{{ reservation.spot.id }}</p>
-                <p class="mb-1"><strong>Parked Since:</strong> {{ reservation.parking_timestamp.strftime('%H:%M, %d/%m/%Y') }}</p>
-                <p class="mb-0"><strong>Rate:</strong> ₹{{ reservation.spot.lot.price }}/hour</p>
-            </div>
-            <div class="col-md-4 text-end">
-                <a href="{{ url_for('user.release_spot', reservation_id=reservation.id) }}" 
-                   class="btn btn-danger"
-                   onclick="return confirm('Are you sure you want to release this spot?')">
-                    <i class="fas fa-sign-out-alt"></i> Release Spot
-                </a>
-            </div>
+<div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h5 class="mb-1"><i class="fas fa-clock"></i> Active Reservation</h5>
+            {% for reservation in active_reservations %}
+            <p class="mb-0">
+                <strong>{{ reservation.spot.lot.prime_location_name }}</strong> - Spot #{{ reservation.spot.id }} | 
+                Parked Since: {{ reservation.parking_timestamp.strftime('%H:%M, %d/%m') }} | 
+                Rate: ₹{{ reservation.spot.lot.price }}/hour
+            </p>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <div class="col-md-4 text-end">
+            {% for reservation in active_reservations %}
+            <a href="{{ url_for('user.release_spot', reservation_id=reservation.id) }}" 
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Are you sure you want to release this spot?')">
+                <i class="fas fa-sign-out-alt"></i> Release Spot
+            </a>
+            {% endfor %}
+        </div>
     </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
 
-<!-- Available Parking Lots -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5><i class="fas fa-building"></i> Available Parking Lots</h5>
+<!-- Full Size Map with Search -->
+<div class="position-relative" style="height: calc(100vh - 120px); min-height: 700px;">
+    <!-- Floating Search Box -->
+    <div class="position-absolute top-0 start-50 translate-middle-x" style="z-index: 1000; margin-top: 20px; width: 90%; max-width: 600px;">
+        <div class="card shadow-lg" style="border-radius: 50px; border: none;">
+            <div class="card-body p-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-0" style="border-radius: 50px 0 0 50px;">
+                        <i class="fas fa-search text-primary"></i>
+                    </span>
+                    <input type="text" id="searchBox" class="form-control border-0" placeholder="Search for parking locations, areas, or addresses..." style="box-shadow: none;">
+                    <button class="btn btn-light border-0" id="clearSearch" style="border-radius: 0 50px 50px 0;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        {% if lots %}
-        <div class="row">
-            {% for lot in lots %}
-            {% set available_spots = lot.spots|selectattr('status', 'equalto', 'A')|list|length %}
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="card-title">{{ lot.prime_location_name }}</h6>
-                        <p class="card-text">
-                            <small class="text-muted">{{ lot.address }}, {{ lot.pin_code }}</small>
-                        </p>
-                        <p class="mb-2">
-                            <strong>Rate:</strong> ₹{{ lot.price }}/hour<br>
-                            <strong>Available:</strong> 
-                            <span class="badge bg-{{ 'success' if available_spots > 0 else 'danger' }}">
-                                {{ available_spots }}/{{ lot.maximum_number_of_spots }}
-                            </span>
-                        </p>
-                        {% if available_spots > 0 and not active_reservations %}
-                        <a href="{{ url_for('user.book_spot', lot_id=lot.id) }}" 
-                           class="btn btn-success btn-sm"
-                           onclick="return confirm('Book a parking spot in {{ lot.prime_location_name }}?')">
-                            <i class="fas fa-car"></i> Book Spot
-                        </a>
-                        {% elif active_reservations %}
-                        <button class="btn btn-secondary btn-sm" disabled>
-                            Already Booked
-                        </button>
-                        {% else %}
-                        <button class="btn btn-danger btn-sm" disabled>
-                            No Spots Available
-                        </button>
-                        {% endif %}
+    
+    <!-- Floating Controls -->
+    <div class="position-absolute top-0 end-0" style="z-index: 999; margin: 20px;">
+        <button class="btn btn-light shadow mb-2" id="centerOnMe" style="border-radius: 50px; padding: 0.7rem 1.5rem; font-weight: 600; display: block; width: 100%;">
+            <i class="fas fa-crosshairs me-2"></i>My Location
+        </button>
+        <button class="btn btn-light shadow" id="showAllParking" style="border-radius: 50px; padding: 0.7rem 1.5rem; font-weight: 600; display: block; width: 100%;">
+            <i class="fas fa-map-marked-alt me-2"></i>Show All
+        </button>
+    </div>
+    
+    <!-- Floating Stats Footer -->
+    <div class="position-absolute bottom-0 start-50 translate-middle-x" style="z-index: 999; margin-bottom: 20px; width: 90%; max-width: 800px;">
+        <div class="card shadow-lg" style="border-radius: 20px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+            <div class="card-body py-3 px-4">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <i class="fas fa-map-marker-alt text-danger"></i> <strong id="totalLots">0</strong> Parking Lots
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-parking text-success"></i> <strong id="availableSpots">0</strong> Spots Available
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-map-pin text-primary"></i> Click markers
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <p class="text-muted">No parking lots available.</p>
-        {% endif %}
     </div>
+    
+    <!-- Full Size Map -->
+    <div id="map" style="height: 100%; width: 100%; border-radius: 0;"></div>
 </div>
 
-<!-- Parking History -->
+<script>
+let map;
+let markers = [];
+let infoWindows = [];
+let userMarker = null;
+let userLocation = null;
+let searchBox;
+let allLots = [];
+const hasActiveReservation = {{ 'true' if active_reservations else 'false' }};
+
+function initMap() {
+    // Default center (India)
+    const defaultCenter = { lat: 20.5937, lng: 78.9629 };
+    
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 6,
+        center: defaultCenter,
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: false,
+        zoomControl: true,
+        styles: [
+            {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+            }
+        ]
+    });
+    
+    // Initialize search box
+    const input = document.getElementById('searchBox');
+    searchBox = new google.maps.places.SearchBox(input);
+    
+    // Bias search results to current map viewport
+    map.addListener('bounds_changed', () => {
+        searchBox.setBounds(map.getBounds());
+    });
+    
+    // Listen for search box selection
+    searchBox.addListener('places_changed', () => {
+        const places = searchBox.getPlaces();
+        
+        if (places.length == 0) {
+            return;
+        }
+        
+        // For each place, get the location and zoom to it
+        const bounds = new google.maps.LatLngBounds();
+        places.forEach(place => {
+            if (!place.geometry || !place.geometry.location) {
+                return;
+            }
+            
+            if (place.geometry.viewport) {
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+        });
+        
+        map.fitBounds(bounds);
+        
+        // Find nearby parking lots
+        if (places.length > 0) {
+            findNearbyParking(places[0].geometry.location);
+        }
+    });
+    
+    // Clear search functionality
+    document.getElementById('clearSearch').addEventListener('click', () => {
+        document.getElementById('searchBox').value = '';
+        showAllParkingLots();
+    });
+    
+    // Show all parking button
+    document.getElementById('showAllParking').addEventListener('click', () => {
+        showAllParkingLots();
+    });
+
+    // Fetch parking lots from API
+    fetch('/api/parking-lots')
+        .then(response => response.json())
+        .then(data => {
+            if (data.lots && data.lots.length > 0) {
+                allLots = data.lots; // Store globally for search
+                displayParkingLots(data.lots);
+                updateStats(data.lots);
+                
+                // Get user's location
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            
+                            // Add user marker
+                            userMarker = new google.maps.Marker({
+                                position: userLocation,
+                                map: map,
+                                icon: {
+                                    url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                                    scaledSize: new google.maps.Size(40, 40)
+                                },
+                                title: 'Your Location',
+                                zIndex: 1000
+                            });
+                            
+                            // Info window for user location
+                            const userInfoWindow = new google.maps.InfoWindow({
+                                content: '<div style="padding: 5px;"><strong>You are here</strong></div>'
+                            });
+                            
+                            userMarker.addListener('click', () => {
+                                infoWindows.forEach(iw => iw.close());
+                                userInfoWindow.open(map, userMarker);
+                            });
+                            
+                            map.setCenter(userLocation);
+                            map.setZoom(13);
+                        },
+                        () => {
+                            // If we have parking lots, center on the first one with coordinates
+                            const firstLotWithCoords = data.lots.find(lot => lot.latitude && lot.longitude);
+                            if (firstLotWithCoords) {
+                                map.setCenter({ 
+                                    lat: firstLotWithCoords.latitude, 
+                                    lng: firstLotWithCoords.longitude 
+                                });
+                                map.setZoom(12);
+                            }
+                        }
+                    );
+                } else {
+                    // No geolocation support, center on first parking lot
+                    const firstLotWithCoords = data.lots.find(lot => lot.latitude && lot.longitude);
+                    if (firstLotWithCoords) {
+                        map.setCenter({ 
+                            lat: firstLotWithCoords.latitude, 
+                            lng: firstLotWithCoords.longitude 
+                        });
+                        map.setZoom(12);
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching parking lots:', error);
+        });
+}
+
+function showAllParkingLots() {
+    // Clear existing markers
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+    infoWindows = [];
+    
+    // Display all parking lots
+    displayParkingLots(allLots);
+    
+    // Fit bounds to show all markers
+    if (allLots.length > 0) {
+        const bounds = new google.maps.LatLngBounds();
+        allLots.forEach(lot => {
+            if (lot.latitude && lot.longitude) {
+                bounds.extend({ lat: lot.latitude, lng: lot.longitude });
+            }
+        });
+        if (userLocation) {
+            bounds.extend(userLocation);
+        }
+        map.fitBounds(bounds);
+    }
+}
+
+function findNearbyParking(location) {
+    // Clear previous search markers
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+    infoWindows = [];
+    
+    // Calculate distances and sort
+    const lotsWithDistance = allLots.map(lot => {
+        if (lot.latitude && lot.longitude) {
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                location,
+                new google.maps.LatLng(lot.latitude, lot.longitude)
+            );
+            return { ...lot, distance };
+        }
+        return null;
+    }).filter(lot => lot !== null);
+    
+    // Sort by distance
+    lotsWithDistance.sort((a, b) => a.distance - b.distance);
+    
+    // Show top 10 nearest parking lots
+    const nearbyLots = lotsWithDistance.slice(0, 10);
+    displayParkingLots(nearbyLots);
+    
+    // Fit bounds to show nearby parking
+    if (nearbyLots.length > 0) {
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(location);
+        nearbyLots.forEach(lot => {
+            bounds.extend({ lat: lot.latitude, lng: lot.longitude });
+        });
+        map.fitBounds(bounds);
+    }
+}
+
+function displayParkingLots(lots) {
+    lots.forEach((lot) => {
+        if (lot.latitude && lot.longitude) {
+            const availableSpots = lot.available_spots;
+            const totalSpots = lot.total_spots;
+            const availabilityPercent = (availableSpots / totalSpots) * 100;
+            
+            // Choose marker color based on availability
+            let markerColor = 'red';
+            if (availabilityPercent > 50) markerColor = 'green';
+            else if (availabilityPercent > 20) markerColor = 'yellow';
+            
+            // Add marker to map
+            const marker = new google.maps.Marker({
+                position: { lat: lot.latitude, lng: lot.longitude },
+                map: map,
+                title: lot.name,
+                animation: google.maps.Animation.DROP,
+                icon: {
+                    url: `http://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`
+                }
+            });
+
+            // Create detailed info window content
+            const availabilityClass = availableSpots > 0 ? 'success' : 'danger';
+            const statusText = availableSpots > 0 ? 'Available' : 'Full';
+            
+            const infoWindowContent = `
+                <div style="padding: 15px; max-width: 300px; font-family: Arial, sans-serif;">
+                    <h5 style="margin: 0 0 10px 0; color: #007bff; font-size: 18px;">
+                        <i class="fas fa-parking" style="color: ${markerColor};"></i> ${lot.name}
+                    </h5>
+                    <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+                        <p style="margin: 5px 0; font-size: 14px; color: #666;">
+                            <i class="fas fa-map-marker-alt"></i> ${lot.address}, ${lot.pin_code}
+                        </p>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <p style="margin: 5px 0; font-size: 15px;">
+                            <strong><i class="fas fa-rupee-sign"></i> Rate:</strong> ₹${lot.price}/hour
+                        </p>
+                        <p style="margin: 5px 0; font-size: 15px;">
+                            <strong><i class="fas fa-car"></i> Availability:</strong> 
+                            <span style="color: ${availableSpots > 0 ? 'green' : 'red'}; font-weight: bold;">
+                                ${availableSpots}/${totalSpots} ${statusText}
+                            </span>
+                        </p>
+                    </div>
+                    ${availableSpots > 0 && !hasActiveReservation ? 
+                        `<a href="/user/book_spot/${lot.id}" 
+                            class="btn btn-success btn-sm" 
+                            style="width: 100%; text-decoration: none; display: inline-block; padding: 8px; text-align: center; border-radius: 4px; background-color: #28a745; color: white;"
+                            onclick="return confirm('Book a parking spot at ${lot.name}?')">
+                            <i class="fas fa-check-circle"></i> Book Parking Spot
+                        </a>` : 
+                        availableSpots === 0 ? 
+                        '<button style="width: 100%; padding: 8px; background-color: #dc3545; color: white; border: none; border-radius: 4px;" disabled><i class="fas fa-times-circle"></i> No Spots Available</button>' :
+                        '<button style="width: 100%; padding: 8px; background-color: #6c757d; color: white; border: none; border-radius: 4px;" disabled><i class="fas fa-info-circle"></i> Already Have Active Booking</button>'
+                    }
+                </div>
+            `;
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: infoWindowContent,
+                maxWidth: 320
+            });
+
+            marker.addListener('click', () => {
+                // Close all other info windows
+                infoWindows.forEach(iw => iw.close());
+                infoWindow.open(map, marker);
+            });
+
+            markers.push(marker);
+            infoWindows.push(infoWindow);
+        }
+    });
+}
+
+function updateStats(lots) {
+    const totalLots = lots.filter(lot => lot.latitude && lot.longitude).length;
+    const totalAvailableSpots = lots.reduce((sum, lot) => sum + lot.available_spots, 0);
+    
+    document.getElementById('totalLots').textContent = totalLots;
+    document.getElementById('availableSpots').textContent = totalAvailableSpots;
+}
+
+// Center on user location button
+document.getElementById('centerOnMe').addEventListener('click', function() {
+    if (userLocation && userMarker) {
+        map.setCenter(userLocation);
+        map.setZoom(14);
+        // Flash the user marker
+        userMarker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => userMarker.setAnimation(null), 2000);
+    } else {
+        // Try to get location again
+        if (navigator.geolocation) {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+            const btn = this;
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    if (!userMarker) {
+                        userMarker = new google.maps.Marker({
+                            position: userLocation,
+                            map: map,
+                            icon: {
+                                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                                scaledSize: new google.maps.Size(40, 40)
+                            },
+                            title: 'Your Location',
+                            zIndex: 1000
+                        });
+                    } else {
+                        userMarker.setPosition(userLocation);
+                    }
+                    
+                    map.setCenter(userLocation);
+                    map.setZoom(14);
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Center on My Location';
+                },
+                () => {
+                    alert('Unable to detect your location. Please enable location access.');
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Center on My Location';
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by your browser.');
+        }
+    }
+});
+
+// Initialize map on page load
+window.addEventListener('load', initMap);
+</script>
+
+<!-- Google Maps API with Places and Geometry libraries -->
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places,geometry">
+</script>
+
+<!-- Parking History Section (Below the Map) -->
 <div class="card">
     <div class="card-header">
-        <h5><i class="fas fa-history"></i> Parking History</h5>
+        <h5><i class="fas fa-history"></i> Your Parking History</h5>
     </div>
     <div class="card-body">
         {% if past_reservations %}
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th>Location</th>
@@ -119,7 +480,7 @@
             </table>
         </div>
         {% else %}
-        <p class="text-muted">No parking history found.</p>
+        <p class="text-muted text-center">No parking history yet. Book your first parking spot from the map above!</p>
         {% endif %}
     </div>
 </div>

@@ -1,47 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header text-center bg-primary text-white">
-                <h4><i class="fas fa-user-plus"></i> Register</h4>
+<div class="row justify-content-center align-items-center" style="min-height: 90vh; padding: 2rem 0;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg animate-fade-in" style="border-radius: 25px; overflow: hidden;">
+            <div class="card-header text-center text-white" style="background: var(--success-color); padding: 2rem;">
+                <div class="mb-3">
+                    <i class="fas fa-user-plus" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-0">Join Parkkaro</h3>
+                <p class="mb-0 opacity-75">Create your account</p>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="padding: 2.5rem;">
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <label for="username" class="form-label fw-bold" style="color: var(--success-color);"><i class="fas fa-user me-2"></i>Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required placeholder="Choose a username">
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-
-                    <!-- New Fields -->
-                    <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" required>
+                        <label for="password" class="form-label fw-bold" style="color: var(--success-color);"><i class="fas fa-lock me-2"></i>Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Create a strong password">
                     </div>
 
                     <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+                        <label for="full_name" class="form-label fw-bold" style="color: var(--success-color);"><i class="fas fa-id-card me-2"></i>Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" required placeholder="Your full name">
                     </div>
 
                     <div class="mb-3">
-                        <label for="pin_code" class="form-label">Pin Code</label>
-                        <input type="text" class="form-control" id="pin_code" name="pin_code" required pattern="[0-9]{6}" title="Enter a 6-digit PIN code">
+                        <label for="address" class="form-label fw-bold" style="color: var(--success-color);"><i class="fas fa-map-marker-alt me-2"></i>Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="2" required placeholder="Your address" style="border-radius: 15px;"></textarea>
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Register</button>
+                    <div class="mb-3">
+                        <label for="pin_code" class="form-label fw-bold" style="color: var(--success-color);"><i class="fas fa-map-pin me-2"></i>Pin Code</label>
+                        <input type="text" class="form-control" id="pin_code" name="pin_code" required pattern="[0-9]{6}" title="Enter a 6-digit PIN code" placeholder="6-digit PIN code">
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-success btn-lg" style="padding: 0.9rem; font-size: 1.1rem;">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
                     </div>
                 </form>
 
-                <div class="text-center mt-3">
-                    <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+                <div class="text-center mt-4">
+                    <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold" style="color: var(--success-color);">Login here</a></p>
                 </div>
             </div>
         </div>

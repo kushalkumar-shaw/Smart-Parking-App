@@ -1,84 +1,590 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="bg-primary text-white py-5 rounded mb-5">
-    <div class="container text-center">
-        <div class="row align-items-center">
-                <h1 class="display-4 fw-bold mb-3">
-                    <i class="fas fa-car me-3"></i>Parkkaro
-                </h1>
-                <p class="lead mb-4">Find, book, and manage parking spots effortlessly. Your convenient parking solution awaits.</p>
-                <div class="d-flex gap-3 justify-content-center">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg px-4">
-                        <i class="fas fa-user-plus me-2"></i>Get Started
-                    </a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login
-                    </a>
+<!-- Hero Section with Background -->
+<section class="hero-section text-white" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); min-height: 100vh; position: relative; overflow: hidden; display: flex; align-items: center;">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="animate-fade-in">
+                    <span class="badge bg-warning text-dark mb-3 px-3 py-2">
+                        <i class="fas fa-star me-2"></i>Smart Parking Solution
+                    </span>
+                    <h1 class="display-2 fw-bold mb-4">
+                        Find Perfect Parking Spots Instantly
+                    </h1>
+                    <p class="lead mb-4 fs-4" style="opacity: 0.95;">
+                        Say goodbye to parking frustration. Book verified parking spots near you with real-time availability on interactive maps.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg px-5 py-3 shadow-lg">
+                            <i class="fas fa-rocket me-2"></i>Get Started Free
+                        </a>
+                        <a href="#how-it-works" class="btn btn-outline-light btn-lg px-5 py-3">
+                            <i class="fas fa-play-circle me-2"></i>See How It Works
+                        </a>
+                    </div>
+                    <div class="mt-4 d-flex gap-4 flex-wrap">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2 text-warning"></i>
+                            <span>Real-time Updates</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2 text-warning"></i>
+                            <span>Instant Booking</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2 text-warning"></i>
+                            <span>Secure Payment</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="position-relative animate-float">
+                    <div class="text-center">
+                        <i class="fas fa-map-marked-alt" style="font-size: 200px; opacity: 0.9;"></i>
+                        <div class="position-absolute top-0 start-0 w-100 h-100">
+                            <i class="fas fa-car text-warning" style="font-size: 60px; position: absolute; top: 20%; left: 30%; animation: pulse 2s infinite;"></i>
+                            <i class="fas fa-map-marker-alt text-success" style="font-size: 40px; position: absolute; top: 60%; right: 25%; animation: bounce 2s infinite;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+    <!-- Decorative Elements -->
+    <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
+    <div style="position: absolute; bottom: -100px; left: -100px; width: 400px; height: 400px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
+</section>
 
 <!-- Features Section -->
-<div class="row mb-5">
-    <div class="col-12 text-center mb-4">
-        <h2 class="fw-bold">Why Choose Parkkaro?</h2>
-        <p class="text-muted">Simple, efficient, and reliable parking management</p>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="text-center">
-            <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                 style="width: 80px; height: 80px;">
-                <i class="fas fa-clock fa-2x text-white"></i>
+<section id="features" class="py-5 mb-5">
+    <div class="container">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <span class="badge bg-primary mb-3 px-3 py-2">Features</span>
+                <h2 class="fw-bold mb-3 display-5">Why Choose Parkkaro?</h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">
+                    Experience the future of parking with our smart, efficient, and user-friendly platform
+                </p>
             </div>
-            <h5>Real-time Availability</h5>
-            <p class="text-muted">Check available spots instantly and book in seconds</p>
         </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="text-center">
-            <div class="bg-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                 style="width: 80px; height: 80px;">
-                <i class="fas fa-mobile-alt fa-2x text-white"></i>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4 h-100 animate-fade-in" style="transition: all 0.3s ease;">
+                    <div class="feature-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-lg" 
+                         style="width: 90px; height: 90px; background: var(--success-color); transition: all 0.3s ease;">
+                        <i class="fas fa-map-marked-alt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--primary-color);">Interactive Maps</h5>
+                    <p class="text-muted mb-0">View all parking locations on Google Maps with real-time availability updates</p>
+                </div>
             </div>
-            <h5>Easy Management</h5>
-            <p class="text-muted">Manage bookings, view history, and track costs effortlessly</p>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="text-center">
-            <div class="bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                 style="width: 80px; height: 80px;">
-                <i class="fas fa-shield-alt fa-2x text-white"></i>
-            </div>
-            <h5>Secure & Reliable</h5>
-            <p class="text-muted">Your bookings are safe with our secure platform</p>
-        </div>
-    </div>
-</div>
 
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4 h-100 animate-fade-in" style="transition: all 0.3s ease; animation-delay: 0.1s;">
+                    <div class="feature-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-lg" 
+                         style="width: 90px; height: 90px; background: var(--primary-color); transition: all 0.3s ease;">
+                        <i class="fas fa-bolt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--primary-color);">Instant Booking</h5>
+                    <p class="text-muted mb-0">Book your parking spot with a single click - no hassle, no waiting</p>
+                </div>
+            </div>
 
-<!-- Stats Section -->
-<div class="bg-light rounded p-4 text-center">
-    <div class="row">
-        <div class="col-md-4">
-            <h3 class="text-primary fw-bold">24/7</h3>
-            <p class="text-muted mb-0">Available Service</p>
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4 h-100 animate-fade-in" style="transition: all 0.3s ease; animation-delay: 0.2s;">
+                    <div class="feature-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-lg" 
+                         style="width: 90px; height: 90px; background: var(--secondary-color); transition: all 0.3s ease;">
+                        <i class="fas fa-clock fa-2x text-white"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--secondary-color);">Real-Time Updates</h5>
+                    <p class="text-muted mb-0">Live parking availability so you never waste time searching for spots</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4 h-100 animate-fade-in" style="transition: all 0.3s ease; animation-delay: 0.3s;">
+                    <div class="feature-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-lg" 
+                         style="width: 90px; height: 90px; background: var(--danger-color); transition: all 0.3s ease;">
+                        <i class="fas fa-shield-alt fa-2x text-white"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--danger-color);">Secure & Safe</h5>
+                    <p class="text-muted mb-0">Your data and payments are protected with industry-standard security</p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <h3 class="text-success fw-bold">Instant</h3>
-            <p class="text-muted mb-0">Booking System</p>
-        </div>
-        <div class="col-md-4">
-            <h3 class="text-warning fw-bold">Smart</h3>
-            <p class="text-muted mb-0">Space Management</p>
+
+        <!-- Additional Features Grid -->
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="d-flex align-items-start p-4 rounded-3 h-100" style="background: rgba(99, 102, 241, 0.05); transition: all 0.3s ease;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: var(--primary-color);">
+                            <i class="fas fa-mobile-alt fa-lg text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: var(--primary-color);">Mobile Friendly</h6>
+                        <p class="text-muted mb-0 small">Access from any device - phone, tablet, or desktop</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="d-flex align-items-start p-4 rounded-3 h-100" style="background: rgba(16, 185, 129, 0.05); transition: all 0.3s ease;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: var(--success-color);">
+                            <i class="fas fa-history fa-lg text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: var(--success-color);">Booking History</h6>
+                        <p class="text-muted mb-0 small">Track all your past bookings and expenses</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="d-flex align-items-start p-4 rounded-3 h-100" style="background: rgba(245, 158, 11, 0.05); transition: all 0.3s ease;">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: var(--secondary-color);">
+                            <i class="fas fa-bell fa-lg text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-2" style="color: var(--secondary-color);">Smart Notifications</h6>
+                        <p class="text-muted mb-0 small">Get alerts about your bookings and availability</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5 mb-5">
+    <div class="container">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <span class="badge bg-success mb-3 px-3 py-2">Simple Process</span>
+                <h2 class="fw-bold mb-3 display-5">How It Works</h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">
+                    Get started in just 3 simple steps and never worry about parking again
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-4">
+                <div class="text-center p-4 h-100 position-relative" style="transition: all 0.3s ease;">
+                    <div class="position-relative d-inline-block mb-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-lg" 
+                             style="width: 120px; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-user-plus text-white" style="font-size: 3rem;"></i>
+                        </div>
+                        <div class="position-absolute top-0 start-0 bg-white text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center shadow" 
+                             style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            1
+                        </div>
+                    </div>
+                    <h4 class="fw-bold mb-3" style="color: #667eea;">Sign Up Free</h4>
+                    <p class="text-muted mb-0">Create your account in less than a minute. No credit card required to get started!</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="text-center p-4 h-100 position-relative" style="transition: all 0.3s ease;">
+                    <div class="position-relative d-inline-block mb-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-lg" 
+                             style="width: 120px; height: 120px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                            <i class="fas fa-search-location text-white" style="font-size: 3rem;"></i>
+                        </div>
+                        <div class="position-absolute top-0 start-0 bg-white text-success fw-bold rounded-circle d-flex align-items-center justify-content-center shadow" 
+                             style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            2
+                        </div>
+                    </div>
+                    <h4 class="fw-bold mb-3" style="color: #11998e;">Find Parking</h4>
+                    <p class="text-muted mb-0">Browse available parking spots near you on our interactive Google Maps interface</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="text-center p-4 h-100 position-relative" style="transition: all 0.3s ease;">
+                    <div class="position-relative d-inline-block mb-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-lg" 
+                             style="width: 120px; height: 120px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-check-circle text-white" style="font-size: 3rem;"></i>
+                        </div>
+                        <div class="position-absolute top-0 start-0 bg-white fw-bold rounded-circle d-flex align-items-center justify-content-center shadow" 
+                             style="width: 40px; height: 40px; font-size: 1.2rem; color: #f093fb;">
+                            3
+                        </div>
+                    </div>
+                    <h4 class="fw-bold mb-3" style="color: #f093fb;">Book & Park</h4>
+                    <p class="text-muted mb-0">Click to book your spot instantly and drive straight to your destination with confidence!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="py-5 mb-5">
+    <div class="container">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <span class="badge bg-warning mb-3 px-3 py-2">Pricing</span>
+                <h2 class="fw-bold mb-3 display-5">Simple, Transparent Pricing</h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">
+                    Pay only for what you use. No hidden fees, no surprises.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-5 justify-content-center">
+            <div class="col-lg-5 col-md-6">
+                <div class="p-5 h-100" style="background: rgba(255, 255, 255, 0.9); border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: var(--primary-color);">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                        <h3 class="fw-bold" style="color: #667eea;">Basic User</h3>
+                        <p class="text-muted">Perfect for occasional parkers</p>
+                    </div>
+                    <div class="text-center mb-4 py-3" style="background: rgba(102, 126, 234, 0.05); border-radius: 20px;">
+                        <h1 class="fw-bold mb-0" style="color: #667eea; font-size: 3rem;">Free</h1>
+                        <p class="text-muted mb-0">Forever</p>
+                    </div>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-3 d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle text-success" style="font-size: 1.3rem;"></i>
+                            </div>
+                            <span>Access to all parking locations</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle text-success" style="font-size: 1.3rem;"></i>
+                            </div>
+                            <span>Real-time availability</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle text-success" style="font-size: 1.3rem;"></i>
+                            </div>
+                            <span>Instant booking</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle text-success" style="font-size: 1.3rem;"></i>
+                            </div>
+                            <span>Booking history</span>
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-lg w-100" style="background: var(--primary-color); color: white; padding: 1rem; font-size: 1.1rem;">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5 col-md-6">
+                <div class="p-5 h-100 position-relative" style="background: var(--primary-color); border-radius: 30px; box-shadow: 0 15px 50px rgba(99, 102, 241, 0.4); transition: all 0.3s ease; transform: scale(1.05);">
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <span class="badge px-4 py-2" style="background: var(--secondary-color); font-size: 0.9rem; border-radius: 50px;">Most Popular</span>
+                    </div>
+                    <div class="text-center mb-4 mt-2">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: rgba(255,255,255,0.2);">
+                            <i class="fas fa-building fa-2x text-white"></i>
+                        </div>
+                        <h3 class="fw-bold text-white">Parking Owner</h3>
+                        <p class="text-white opacity-75">For parking lot operators</p>
+                    </div>
+                    <div class="text-center mb-4 py-3" style="background: rgba(255,255,255,0.15); border-radius: 20px; backdrop-filter: blur(10px);">
+                        <h1 class="fw-bold mb-0 text-white" style="font-size: 3rem;">Custom</h1>
+                        <p class="text-white opacity-75 mb-0">Contact us for pricing</p>
+                    </div>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-3 d-flex align-items-center text-white">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle" style="font-size: 1.3rem; opacity: 0.9;"></i>
+                            </div>
+                            <span>All Basic features</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center text-white">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle" style="font-size: 1.3rem; opacity: 0.9;"></i>
+                            </div>
+                            <span>Manage multiple locations</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center text-white">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle" style="font-size: 1.3rem; opacity: 0.9;"></i>
+                            </div>
+                            <span>Analytics dashboard</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center text-white">
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle" style="font-size: 1.3rem; opacity: 0.9;"></i>
+                            </div>
+                            <span>Revenue tracking</span>
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-lg w-100 btn-light" style="padding: 1rem; font-size: 1.1rem; font-weight: 600; color: var(--primary-color);">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5 mb-5 bg-light">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-map-marker-alt text-primary mb-3" style="font-size: 50px;"></i>
+                    <h2 class="fw-bold text-primary mb-2 counter" data-target="100">0</h2>
+                    <p class="text-muted mb-0">Parking Locations</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-users text-success mb-3" style="font-size: 50px;"></i>
+                    <h2 class="fw-bold text-success mb-2 counter" data-target="5000">0</h2>
+                    <p class="text-muted mb-0">Happy Users</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-parking text-info mb-3" style="font-size: 50px;"></i>
+                    <h2 class="fw-bold text-info mb-2 counter" data-target="1000">0</h2>
+                    <p class="text-muted mb-0">Parking Spots</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-clock text-warning mb-3" style="font-size: 50px;"></i>
+                    <h2 class="fw-bold text-warning mb-2">24/7</h2>
+                    <p class="text-muted mb-0">Support Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <span class="badge bg-info mb-3 px-3 py-2">Testimonials</span>
+                <h2 class="fw-bold mb-3 display-5">What Our Users Say</h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">
+                    Don't just take our word for it - hear from our satisfied customers
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="text-muted mb-4">"Parkkaro has made my daily commute so much easier! I can now find parking spots near my office in seconds. The map interface is super intuitive!"</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Rajesh Kumar</h6>
+                                <small class="text-muted">Software Engineer</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="text-muted mb-4">"As a parking lot owner, this platform has helped me maximize my occupancy. The admin dashboard is excellent for managing bookings and revenue."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Priya Sharma</h6>
+                                <small class="text-muted">Business Owner</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="text-muted mb-4">"The real-time updates are a game changer. I never waste time searching for parking anymore. Highly recommend to everyone!"</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Amit Patel</h6>
+                                <small class="text-muted">Entrepreneur</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 mb-5">
+    <div class="cta-section text-white py-5 rounded shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container text-center">
+            <h2 class="display-4 fw-bold mb-4">Ready to Find Your Perfect Parking Spot?</h2>
+            <p class="lead mb-4 fs-4">Join thousands of users who have simplified their parking experience</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg px-5 py-3 shadow">
+                    <i class="fas fa-rocket me-2"></i>Start Parking Smarter Today
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-5 py-3">
+                    <i class="fas fa-sign-in-alt me-2"></i>Already Have Account?
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 
 <style>
-.fa-10x { font-size: 8rem !important; }
+.hero-section {
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    border-color: #667eea !important;
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.stat-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.stat-card:hover {
+    background: #f8f9fa;
+    transform: scale(1.05);
+}
+
+.cta-section {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+/* Counter Animation */
+@keyframes countUp {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.counter {
+    animation: countUp 2s ease-out;
+}
 </style>
+
+<script>
+// Counter Animation
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.counter');
+    
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 2000; // 2 seconds
+        const increment = target / (duration / 16); // 60fps
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.floor(current) + '+';
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target + '+';
+            }
+        };
+        
+        // Start animation when element is visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    updateCounter();
+                    observer.disconnect();
+                }
+            });
+        });
+        
+        observer.observe(counter);
+    });
+});
+</script>
 {% endblock %}

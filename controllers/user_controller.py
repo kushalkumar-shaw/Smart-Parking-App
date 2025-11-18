@@ -22,7 +22,8 @@ def dashboard():
         lots=lots,
         active_reservations=active,
         past_reservations=past,
-        user=user
+        user=user,
+        google_maps_api_key=current_app.config.get('GOOGLE_MAPS_API_KEY')
     )
 
 @user_bp.route('/map')
