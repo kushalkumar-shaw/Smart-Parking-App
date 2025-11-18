@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, current_app
 from models.models import db, ParkingLot, ParkingSpot, Reservation, User
 from datetime import datetime
 
@@ -24,6 +24,16 @@ def dashboard():
         past_reservations=past,
         user=user
     )
+
+@user_bp.route('/map')
+def map_view():
+    if not user_required():
+        return redirect(url_for('auth.login'))
+    
+    active = Reservation.query.filter_by(user_id=session['user_id'], is_active=True).all()
+    return render_template('user/map_view.html', 
+                         active_reservations=active,
+                         google_maps_api_key=current_app.config.get('GOOGLE_MAPS_API_KEY'))
 
 @user_bp.route('/book_spot/<int:lot_id>')
 def book_spot(lot_id):

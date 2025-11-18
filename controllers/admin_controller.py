@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 from models.models import db, ParkingLot, ParkingSpot, User, Reservation
 
 admin_bp = Blueprint('admin', __name__)
@@ -32,6 +32,8 @@ def add_lot():
             price=float(request.form['price']),
             address=request.form['address'],
             pin_code=request.form['pin_code'],
+            latitude=float(request.form['latitude']) if request.form.get('latitude') else None,
+            longitude=float(request.form['longitude']) if request.form.get('longitude') else None,
             maximum_number_of_spots=int(request.form['spots'])
         )
         db.session.add(lot)
@@ -44,7 +46,8 @@ def add_lot():
         flash('New lot added.', 'success')
         return redirect(url_for('admin.dashboard'))
     
-    return render_template('admin/add_lot.html')
+    return render_template('admin/add_lot.html', 
+                         google_maps_api_key=current_app.config.get('GOOGLE_MAPS_API_KEY'))
 
 @admin_bp.route('/edit_lot/<int:lot_id>', methods=['GET', 'POST'])
 def edit_lot(lot_id):
@@ -58,6 +61,8 @@ def edit_lot(lot_id):
         lot.price = float(request.form['price'])
         lot.address = request.form['address']
         lot.pin_code = request.form['pin_code']
+        lot.latitude = float(request.form['latitude']) if request.form.get('latitude') else None
+        lot.longitude = float(request.form['longitude']) if request.form.get('longitude') else None
         new_total = int(request.form['spots'])
         
         if new_total > lot.maximum_number_of_spots:
@@ -74,7 +79,8 @@ def edit_lot(lot_id):
         flash('Lot updated.', 'success')
         return redirect(url_for('admin.dashboard'))
     
-    return render_template('admin/edit_lot.html', lot=lot)
+    return render_template('admin/edit_lot.html', lot=lot,
+                         google_maps_api_key=current_app.config.get('GOOGLE_MAPS_API_KEY'))
 
 @admin_bp.route('/delete_lot/<int:lot_id>')
 def delete_lot(lot_id):

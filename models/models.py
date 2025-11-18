@@ -19,6 +19,8 @@ class ParkingLot(db.Model):
     price = db.Column(db.Float, nullable=False)
     address = db.Column(db.String(200), nullable=False)
     pin_code = db.Column(db.String(10), nullable=False)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
     maximum_number_of_spots = db.Column(db.Integer, nullable=False)
     spots = db.relationship('ParkingSpot', backref='lot', lazy=True, cascade='all, delete-orphan')
 

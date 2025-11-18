@@ -46,6 +46,36 @@
                             </div>
                         </div>
                     </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> <strong>GPS Coordinates (Optional)</strong><br>
+                        <small>Click "Pick Location on Map" to select the parking lot location, or enter coordinates manually.</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="latitude" class="form-label">Latitude</label>
+                                <input type="number" step="any" class="form-control" id="latitude" name="latitude" 
+                                       value="{{ lot.latitude if lot.latitude else '' }}" placeholder="e.g., 28.6139" readonly>
+                                <div class="form-text">Click the button below to pick location</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="longitude" class="form-label">Longitude</label>
+                                <input type="number" step="any" class="form-control" id="longitude" name="longitude" 
+                                       value="{{ lot.longitude if lot.longitude else '' }}" placeholder="e.g., 77.2090" readonly>
+                                <div class="form-text">Click the button below to pick location</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mapModal">
+                            <i class="fas fa-map-marker-alt"></i> Pick Location on Map
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="detectLocation">
+                            <i class="fas fa-crosshairs"></i> Use My Current Location
+                        </button>
+                    </div>
                     <div class="d-flex justify-content-between">
                         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back
@@ -59,4 +89,183 @@
         </div>
     </div>
 </div>
+
+<!-- Map Modal -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mapModalLabel">
+                    <i class="fas fa-map-marked-alt"></i> Pick Parking Lot Location
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Click on the map to select the parking lot location. The marker shows your selected position. You can also drag the marker.
+                </div>
+                <div id="pickMap" style="height: 400px; width: 100%;"></div>
+                <div class="mt-3">
+                    <p class="mb-1"><strong>Selected Coordinates:</strong></p>
+                    <p class="mb-0" id="selectedCoords">No location selected yet</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmLocation">
+                    <i class="fas fa-check"></i> Confirm Location
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let pickMap;
+let marker;
+let selectedLat;
+let selectedLng;
+const existingLat = {{ lot.latitude if lot.latitude else 'null' }};
+const existingLng = {{ lot.longitude if lot.longitude else 'null' }};
+
+// Initialize map when modal is shown
+document.getElementById('mapModal').addEventListener('shown.bs.modal', function () {
+    if (!pickMap) {
+        initPickMap();
+    }
+});
+
+function initPickMap() {
+    // Default center (India)
+    const defaultCenter = { lat: 20.5937, lng: 78.9629 };
+    
+    pickMap = new google.maps.Map(document.getElementById('pickMap'), {
+        zoom: 12,
+        center: defaultCenter,
+        mapTypeControl: true,
+        streetViewControl: true
+    });
+
+    // If lot already has coordinates, use them
+    if (existingLat && existingLng) {
+        const existingLocation = { lat: existingLat, lng: existingLng };
+        pickMap.setCenter(existingLocation);
+        placeMarker(existingLocation);
+    } else {
+        // Try to get admin's current location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    pickMap.setCenter(userLocation);
+                    
+                    // Set initial marker at admin's location
+                    placeMarker(userLocation);
+                },
+                (error) => {
+                    console.log('Geolocation error:', error);
+                }
+            );
+        }
+    }
+
+    // Add click listener to map
+    pickMap.addListener('click', (event) => {
+        placeMarker(event.latLng);
+    });
+}
+
+function placeMarker(location) {
+    // Remove old marker if exists
+    if (marker) {
+        marker.setMap(null);
+    }
+
+    // Create new marker
+    marker = new google.maps.Marker({
+        position: location,
+        map: pickMap,
+        draggable: true,
+        animation: google.maps.Animation.DROP
+    });
+
+    // Update coordinates when marker is dragged
+    marker.addListener('dragend', (event) => {
+        updateSelectedCoords(event.latLng.lat(), event.latLng.lng());
+    });
+
+    // Update selected coordinates
+    updateSelectedCoords(location.lat(), location.lng());
+}
+
+function updateSelectedCoords(lat, lng) {
+    selectedLat = lat;
+    selectedLng = lng;
+    document.getElementById('selectedCoords').innerHTML = 
+        `<span class="text-primary">Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}</span>`;
+}
+
+// Confirm location button
+document.getElementById('confirmLocation').addEventListener('click', function() {
+    if (selectedLat && selectedLng) {
+        document.getElementById('latitude').value = selectedLat.toFixed(6);
+        document.getElementById('longitude').value = selectedLng.toFixed(6);
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('mapModal'));
+        modal.hide();
+    } else {
+        alert('Please select a location on the map first.');
+    }
+});
+
+// Detect current location button
+document.getElementById('detectLocation').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+        const btn = this;
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+                document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+                btn.innerHTML = '<i class="fas fa-check"></i> Location Detected!';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
+                }, 2000);
+            },
+            (error) => {
+                alert('Unable to detect location. Please enable location access or pick location on map.');
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
+            }
+        );
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+});
+
+// Auto-detect location on page load if no existing coordinates
+window.addEventListener('load', function() {
+    if (!existingLat && !existingLng && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+                document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+            },
+            (error) => {
+                console.log('Auto-detection failed:', error);
+            }
+        );
+    }
+});
+</script>
+
+<!-- Google Maps API -->
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}">
+</script>
 {% endblock %}
