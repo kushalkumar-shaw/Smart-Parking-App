@@ -9,19 +9,20 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         :root {
-            --primary-color: #6366F1;
-            --primary-dark: #4F46E5;
-            --primary-light: #818CF8;
-            --secondary-color: #F59E0B;
+            --primary-color: #0d3b66;
+            --primary-dark: #092a47;
+            --primary-light: #1a5490;
+            --secondary-color: #f4d35e;
+            --accent-color: #faf0ca;
             --success-color: #10B981;
             --danger-color: #EF4444;
             --text-dark: #1F2937;
             --text-muted: #6B7280;
-            --bg-light: #F9FAFB;
+            --bg-light: #faf0ca;
         }
         
         body {
-            background-color: #FFFFFF;
+            background-color: var(--accent-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             color: var(--text-dark);
@@ -89,12 +90,13 @@
         
         .btn-warning {
             background: var(--secondary-color);
-            color: white;
+            color: var(--primary-color);
+            font-weight: 700;
         }
         
         .btn-warning:hover {
-            background: #D97706;
-            color: white;
+            background: #f0c74b;
+            color: var(--primary-color);
         }
         
         .btn-danger {
