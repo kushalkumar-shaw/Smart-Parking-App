@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'gzth3r3s3cr3tk3y'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///parking_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['GOOGLE_MAPS_API_KEY'] = 'AIzaSyA0H5SzwC0e3vlQglnCY9neAQfhVPzFHYs'  # Replace with your actual API key
+app.config['GOOGLE_MAPS_API_KEY'] = ''  # Replace with your actual API key
 
 db.init_app(app)
 
